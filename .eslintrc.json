@@ -1,0 +1,46 @@
+{
+  "extends": "airbnb",
+  "env": {
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 8
+  },
+  "rules": {
+    "indent": [
+      "error",
+      4
+    ],
+    "linebreak-style": [
+      "error",
+      "unix"
+    ],
+    "quotes": [
+      "error",
+      "double"
+    ],
+    "semi": [
+      "error",
+      "always"
+    ],
+    "no-cond-assign": [
+      "error",
+      "always"
+    ],
+    "no-multi-spaces": [
+      "error",
+      {
+        "ignoreEOLComments": true
+      }
+    ],
+    "import/newline-after-import": "off",
+    "prefer-destructuring": "off",
+    "no-console": "off",
+    "no-use-before-define": "off",
+    "comma-dangle": ["warn", "never"],
+    "no-await-in-loop":"off",
+    "no-restricted-syntax": ["error", "ForInStatement", "LabeledStatement", "WithStatement"],
+    "object-shorthand": "off",
+    "global-require": "off"
+  }
+}

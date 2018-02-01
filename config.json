@@ -1,0 +1,8 @@
+{
+    "smartsheetAccessToken": "",
+    "logLevel": "info",
+
+    "sheetId": 7431659491485572,
+    "callbackUrl": "https://fbc61a7b.ngrok.io",
+    "webhookName": "Test webhook 2"
+}
