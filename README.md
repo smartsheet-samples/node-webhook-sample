@@ -1,4 +1,4 @@
-# node-webhook
+# node-webhook-sample
 This sample node application demonstrates how to create a Shartsheet webhook and handle callback events.
 
 Smartsheet webhook documentation is here [http://smartsheet-platform.github.io/api-docs/#webhooks](http://smartsheet-platform.github.io/api-docs/#webhooks)
@@ -9,7 +9,7 @@ Make sure you have [Node.js](http://nodejs.org/) installed.
 For code clarity, this sample uses _async_ and _await_ so requires node.js version 7.6 or later.
 
 ```sh
-git clone git@github.com:smartsheet-platform/node-webhook.git # or clone your own fork
+git clone git@github.com:smartsheet-samples/node-webhook-sample.git # or clone your own fork
 cd node-webhook
 npm install
 ```
