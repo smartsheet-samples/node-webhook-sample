@@ -2,7 +2,7 @@
     "smartsheetAccessToken": "",
     "logLevel": "info",
 
-    "sheetId": 7431659491485572,
-    "callbackUrl": "https://275e26e5.ngrok.io",
-    "webhookName": "Test webhook 3"
+    "sheetId": 5871715558418308,
+    "callbackUrl": "https://fbc61a7b.ngrok.io",
+    "webhookName": "Test webhook"
 }

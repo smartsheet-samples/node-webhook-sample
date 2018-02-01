@@ -9,76 +9,17 @@ app.use(bodyParser.json());
 
 const ssSdk = require("smartsheet");
 
-// This method receives the webhook callbacks from Smartsheet
-app.post("/", async (req, res) => {
-    try {
-        const body = req.body;
-
-        // Callback could be due to validation, status change, or actual sheet change events
-        if (body.challenge) {
-            console.log("Received verification callback");
-            // Verify we are listening by echoing challenge value
-            res.status(200)
-                .json({ smartsheetHookResponse: body.challenge });
-        } else if (body.events) {
-            console.log(`Received event callback with ${body.events.length} events`);
-            res.status(200);
-
-            // Note that the callback response must be recieved within a few seconds.
-            // If you are doing complex processing, you may need to queue up pending work.
-            await processEvents(body);
-        } else if (body.newWebHookStatus) {
-            console.log(`Received status callback, new status: ${body.newWebHookStatus}`);
-            res.status(200);
-        } else {
-            console.log(`Received unknown callback: ${body}`);
-            res.status(200);
-        }
-    } catch (error) {
-        console.log(error);
-        res.status(500);
-    }
-});
-
-/*
-* Process callback events
-* This sample implementation only logs to the console.
-* Your implementation might make updates or send data to another system.
-* Beware of infinte loops if you make modifications to the same sheet
-*/
-async function processEvents(callbackData) {
-    if (callbackData.scope !== "sheet") {
-        return;
-    }
-
-    // This sample handles each event individually.
-    // Some changes (e.g. column rename) could impact a large number of cells.
-    // A complete implementation should consolidate related events and/or cache intermediate data
-    for (const event of callbackData.events) {
-        // This sample only considers cell changes
-        if (event.objectType === "cell") {
-            console.log(`Cell changed, row id: ${event.rowId}, column id ${event.columnId}`);
-
-            // Since event data is "thin", we need to read from the sheet to get updated values.
-            const options = {
-                id: callbackData.scopeObjectId,             // Get sheet id from callback
-                queryParameters: {
-                    rowIds: event.rowId.toString(),         // Just read one row
-                    columnIds: event.columnId.toString()    // Just read one column
-                }
-            };
-            const response = await ssClient.sheets.getSheet(options);
-            const row = response.rows[0];
-            const cell = row.cells[0];
-            const column = response.columns.find(c => c.id === cell.columnId);
-            console.log(`**** New cell value "${cell.displayValue}" in column "${column.title}", row number ${row.rowNumber}`);
-        }
-    }
+// Initialize client SDK
+function initializeSmartsheetClient(token, logLevel) {
+    ssClient = ssSdk.createClient({
+        // If token is falsy, value will be read from SMARTSHEET_ACCESS_TOKEN environment variable
+        accessToken: token,
+        logLevel: logLevel
+    });
 }
 
 // Check that we can access the sheet
 async function probeSheet(targetSheetId) {
-// Confirm that we can access the sheet
     console.log(`Checking for sheet id: ${targetSheetId}`);
     const getSheetOptions = {
         id: targetSheetId,
@@ -103,10 +44,11 @@ async function initializeHook(targetSheetId, hookName, callbackUrl) {
         });
         console.log(`Found ${listHooksResponse.totalCount} hooks owned by user`);
 
-        // Check for hooks on this sheet, for this app
+        // Check for hooks on this sheet, for this app, and url
         for (const hook of listHooksResponse.data) {
             if (hook.scopeObjectId === targetSheetId &&
-                hook.name === hookName
+                hook.name === hookName &&
+                hook.callbackUrl === callbackUrl
             ) {
                 webhook = hook;
                 console.log(`Found matching hook with id: ${webhook.id}`);
@@ -148,13 +90,72 @@ async function initializeHook(targetSheetId, hookName, callbackUrl) {
     }
 }
 
-// Initialize client SDK
-function initializeSmartsheetClient(token, logLevel) {
-    ssClient = ssSdk.createClient({
-        // If token is falsy, value will be read from SMARTSHEET_ACCESS_TOKEN environment variable
-        accessToken: token,
-        logLevel: logLevel
-    });
+
+// This method receives the webhook callbacks from Smartsheet
+app.post("/", async (req, res) => {
+    try {
+        const body = req.body;
+
+        // Callback could be due to validation, status change, or actual sheet change events
+        if (body.challenge) {
+            console.log("Received verification callback");
+            // Verify we are listening by echoing challenge value
+            res.status(200)
+                .json({ smartsheetHookResponse: body.challenge });
+        } else if (body.events) {
+            console.log(`Received event callback with ${body.events.length} events`);
+            res.status(200);
+
+            // Note that the callback response must be received within a few seconds.
+            // If you are doing complex processing, you may need to queue up pending work.
+            await processEvents(body);
+        } else if (body.newWebHookStatus) {
+            console.log(`Received status callback, new status: ${body.newWebHookStatus}`);
+            res.status(200);
+        } else {
+            console.log(`Received unknown callback: ${body}`);
+            res.status(200);
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500);
+    }
+});
+
+/*
+* Process callback events
+* This sample implementation only logs to the console.
+* Your implementation might make updates or send data to another system.
+* Beware of infinite loops if you make modifications to the same sheet
+*/
+async function processEvents(callbackData) {
+    if (callbackData.scope !== "sheet") {
+        return;
+    }
+
+    // This sample handles each event individually.
+    // Some changes (e.g. column rename) could impact a large number of cells.
+    // A complete implementation should consolidate related events and/or cache intermediate data
+    for (const event of callbackData.events) {
+        // This sample only considers cell changes
+        if (event.objectType === "cell") {
+            console.log(`Cell changed, row id: ${event.rowId}, column id ${event.columnId}`);
+
+            // Since event data is "thin", we need to read from the sheet to get updated values.
+            const options = {
+                id: callbackData.scopeObjectId,             // Get sheet id from callback
+                queryParameters: {
+                    rowIds: event.rowId.toString(),         // Just read one row
+                    columnIds: event.columnId.toString()    // Just read one column
+                }
+            };
+            const response = await ssClient.sheets.getSheet(options);
+            const row = response.rows[0];
+            const cell = row.cells[0];
+            const column = response.columns.find(c => c.id === cell.columnId);
+            console.log(`**** New cell value "${cell.displayValue}" in column "${column.title}", row number ${row.rowNumber}`);
+        }
+    }
 }
 
 // main
@@ -169,7 +170,7 @@ function initializeSmartsheetClient(token, logLevel) {
         await probeSheet(config.sheetId);
 
         app.listen(3000, () =>
-            console.log("Node-webhook sample app listening on port 3000!"));
+            console.log("Node-webhook-sample app listening on port 3000"));
 
         await initializeHook(config.sheetId, config.webhookName, config.callbackUrl);
     } catch (err) {
