@@ -15,7 +15,7 @@ npm install
 ```
 
 ## Determining the callback url
-Webhooks are HTTP callbacks from Smartsheet servers to your code. So your web application must be accesible from the
+Webhooks are HTTP callbacks from Smartsheet servers to your code. So your web application must be accessible from the
 public internet. An easy way to achieve this in a development environment is with the tool [ngrok](https://ngrok.com/).
 
 After installing, start ngrok with the command `ngrok http 3000`. In the resulting screen, note the https forwarding url
@@ -23,7 +23,7 @@ which will look something like `https://fbc72a6b.ngrok.io`.
 Update the `config.json` file with this value.
 
 Leave ngrok running. If you restart ngrok, you will get a different callback url and will need to update config.json and
-restart this applicaion.
+restart this application.
 
 ## Configuration
 Create a test sheet to monitor. Every change to that sheet will result in a webhook callback. Determine the sheet id, 
