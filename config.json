@@ -3,6 +3,6 @@
     "logLevel": "info",
 
     "sheetId": 7431659491485572,
-    "callbackUrl": "https://fbc61a7b.ngrok.io",
-    "webhookName": "Test webhook 2"
+    "callbackUrl": "https://275e26e5.ngrok.io",
+    "webhookName": "Test webhook 3"
 }
