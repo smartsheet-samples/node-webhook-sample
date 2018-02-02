@@ -104,11 +104,12 @@ app.post("/", async (req, res) => {
                 .json({ smartsheetHookResponse: body.challenge });
         } else if (body.events) {
             console.log(`Received event callback with ${body.events.length} events`);
-            res.status(200);
 
             // Note that the callback response must be received within a few seconds.
-            // If you are doing complex processing, you may need to queue up pending work.
+            // If you are doing complex processing, you will need to queue up pending work.
             await processEvents(body);
+
+            res.status(200);
         } else if (body.newWebHookStatus) {
             console.log(`Received status callback, new status: ${body.newWebHookStatus}`);
             res.status(200);
@@ -164,7 +165,7 @@ async function processEvents(callbackData) {
         // TODO: Edit config.json to set desired sheet id and API token
         const config = require("./config.json");
 
-        initializeSmartsheetClient(config.accessToken, config.logLevel);
+        initializeSmartsheetClient(config.smartsheetAccessToken, config.logLevel);
 
         // Sanity check: make sure we can access the sheet
         await probeSheet(config.sheetId);
