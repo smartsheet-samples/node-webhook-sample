@@ -44,11 +44,11 @@ async function initializeHook(targetSheetId, hookName, callbackUrl) {
         });
         console.log(`Found ${listHooksResponse.totalCount} hooks owned by user`);
 
-        // Check for hooks on this sheet, for this app, and url
+        // Check for existing hooks on this sheet for this app
         for (const hook of listHooksResponse.data) {
-            if (hook.scopeObjectId === targetSheetId &&
-                hook.name === hookName &&
-                hook.callbackUrl === callbackUrl
+            if (hook.scopeObjectId === targetSheetId
+                && hook.name === hookName
+                // && hook.callbackUrl === callbackUrl   // Might be appropriate for your scenario
             ) {
                 webhook = hook;
                 console.log(`Found matching hook with id: ${webhook.id}`);
@@ -103,23 +103,23 @@ app.post("/", async (req, res) => {
             res.status(200)
                 .json({ smartsheetHookResponse: body.challenge });
         } else if (body.events) {
-            console.log(`Received event callback with ${body.events.length} events`);
+            console.log(`Received event callback with ${body.events.length} events at ${new Date().toLocaleString()}`);
 
             // Note that the callback response must be received within a few seconds.
             // If you are doing complex processing, you will need to queue up pending work.
             await processEvents(body);
 
-            res.status(200);
+            res.sendStatus(200);
         } else if (body.newWebHookStatus) {
             console.log(`Received status callback, new status: ${body.newWebHookStatus}`);
-            res.status(200);
+            res.sendStatus(200);
         } else {
             console.log(`Received unknown callback: ${body}`);
-            res.status(200);
+            res.sendStatus(200);
         }
     } catch (error) {
         console.log(error);
-        res.status(500);
+        res.status(500).send(`Error: ${error}`);
     }
 });
 
