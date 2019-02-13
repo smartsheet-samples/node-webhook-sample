@@ -1,4 +1,4 @@
-let ssClient;           // Smartsheet JS client object
+let smarClient;           // Smartsheet JS client object
 
 // Dependent libraries
 const express = require("express");
@@ -7,11 +7,11 @@ const app = express();
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
-const ssSdk = require("smartsheet");
+const smarSdk = require("smartsheet");
 
 // Initialize client SDK
 function initializeSmartsheetClient(token, logLevel) {
-    ssClient = ssSdk.createClient({
+    smarClient = smarSdk.createClient({
         // If token is falsy, value will be read from SMARTSHEET_ACCESS_TOKEN environment variable
         accessToken: token,
         logLevel: logLevel
@@ -25,7 +25,7 @@ async function probeSheet(targetSheetId) {
         id: targetSheetId,
         queryParameters: { pageSize: 1 } // Only return first row to reduce payload
     };
-    const sheetResponse = await ssClient.sheets.getSheet(getSheetOptions);
+    const sheetResponse = await smarClient.sheets.getSheet(getSheetOptions);
     console.log(`Found sheet: "${sheetResponse.name}" at ${sheetResponse.permalink}`);
 }
 
@@ -69,7 +69,7 @@ async function initializeHook(targetSheetId, hookName, callbackUrl) {
                 }
             };
 
-            const createResponse = await ssClient.webhooks.createWebhook(options);
+            const createResponse = await smarClient.webhooks.createWebhook(options);
             webhook = createResponse.result;
 
             console.log(`Created new hook: ${webhook.id}`);
@@ -82,7 +82,7 @@ async function initializeHook(targetSheetId, hookName, callbackUrl) {
             body: { enabled: true }
         };
 
-        const updateResponse = await ssClient.webhooks.updateWebhook(options);
+        const updateResponse = await smarClient.webhooks.updateWebhook(options);
         const updatedWebhook = updateResponse.result;
         console.log(`Hook enabled: ${updatedWebhook.enabled}, status: ${updatedWebhook.status}`);
     } catch (err) {
@@ -150,7 +150,7 @@ async function processEvents(callbackData) {
                     columnIds: event.columnId.toString()    // Just read one column
                 }
             };
-            const response = await ssClient.sheets.getSheet(options);
+            const response = await smarClient.sheets.getSheet(options);
             const row = response.rows[0];
             const cell = row.cells[0];
             const column = response.columns.find(c => c.id === cell.columnId);
