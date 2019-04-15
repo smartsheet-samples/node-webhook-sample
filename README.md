@@ -12,7 +12,7 @@ For code clarity, this sample uses _async_ and _await_ so requires node.js versi
 
 ```sh
 git clone git@github.com:smartsheet-samples/node-webhook-sample.git # or clone your own fork
-cd node-webhook
+cd node-webhook-sample
 npm install
 ```
 
