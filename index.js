@@ -39,7 +39,7 @@ async function initializeHook(targetSheetId, hookName, callbackUrl) {
         let webhook = null;
 
         // Get *all* my hooks
-        const listHooksResponse = await ssClient.webhooks.listWebhooks({
+        const listHooksResponse = await smarClient.webhooks.listWebhooks({
             includeAll: true
         });
         console.log(`Found ${listHooksResponse.totalCount} hooks owned by user`);
